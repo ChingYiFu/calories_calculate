@@ -2,23 +2,23 @@ const Dashboard = {
   chart: null,
 
   render() {
-    const profile  = Storage.getProfile();
-    const today    = Utils.today();
-    const foodLogs = Storage.getFoodLogs(today);
-    const exLogs   = Storage.getExerciseLogs(today);
+    var profile  = Storage.getProfile();
+    var today    = Utils.today();
+    var foodLogs = Storage.getFoodLogs(today);
+    var exLogs   = Storage.getExerciseLogs(today);
 
-    const bmr        = profile.bmr ? Math.round(profile.bmr) : 0;
-    const foodCal    = foodLogs.reduce(function(s,l){ return s + l.calories; }, 0);
-    const protein    = foodLogs.reduce(function(s,l){ return s + (l.protein || 0); }, 0);
-    const exCal      = exLogs.reduce(function(s,l){ return s + l.calories_burned; }, 0);
-    const total_burn = bmr + exCal;
-    const balance    = foodCal - total_burn;
-    const isDeficit  = balance < 0;
-    const pct        = total_burn > 0 ? Math.min(100, Math.round((foodCal / total_burn) * 100)) : 0;
-    const proteinGoal = profile.weight_kg ? Math.round(profile.weight_kg * 1.6) : 0;
-    const proteinPct  = proteinGoal > 0 ? Math.min(100, Math.round((protein / proteinGoal) * 100)) : 0;
+    var bmr        = profile.bmr ? Math.round(profile.bmr) : 0;
+    var foodCal    = foodLogs.reduce(function(s,l){ return s + l.calories; }, 0);
+    var protein    = foodLogs.reduce(function(s,l){ return s + (l.protein || 0); }, 0);
+    var exCal      = exLogs.reduce(function(s,l){ return s + l.calories_burned; }, 0);
+    var total_burn = bmr + exCal;
+    var balance    = foodCal - total_burn;
+    var isDeficit  = balance < 0;
+    var pct        = total_burn > 0 ? Math.min(100, Math.round((foodCal / total_burn) * 100)) : 0;
+    var proteinGoal = profile.weight_kg ? Math.round(profile.weight_kg * 1.6) : 0;
+    var proteinPct  = proteinGoal > 0 ? Math.min(100, Math.round((protein / proteinGoal) * 100)) : 0;
 
-    let html = '<div class="screen" id="screen-dashboard">';
+    var html = '<div class="screen" id="screen-dashboard">';
     html += '<div class="screen-header">';
     html += '<h2 class="screen-title">今日總覽</h2>';
     html += '<p class="screen-subtitle">' + Utils.formatDate(today) + (profile.weight_kg ? ' · ' + profile.weight_kg + ' kg' : '') + '</p>';
@@ -32,40 +32,37 @@ const Dashboard = {
     html += '<div class="stat-card stat-bmr"><div class="stat-icon">🔥</div><div class="stat-value">' + bmr + '</div><div class="stat-label">基礎代謝 kcal</div></div>';
     html += '<div class="stat-card stat-exercise"><div class="stat-icon">⚡</div><div class="stat-value">' + exCal + '</div><div class="stat-label">運動消耗 kcal</div></div>';
     html += '<div class="stat-card stat-food"><div class="stat-icon">🍽️</div><div class="stat-value">' + foodCal + '</div><div class="stat-label">今日攝取 kcal</div></div>';
-    const balClass = isDeficit ? 'stat-deficit' : 'stat-surplus';
-    const balIcon  = isDeficit ? '📉' : '📈';
-    const balLabel = isDeficit ? '熱量赤字 kcal' : '熱量盈餘 kcal';
+    var balClass = isDeficit ? 'stat-deficit' : 'stat-surplus';
+    var balIcon  = isDeficit ? '📉' : '📈';
+    var balLabel = isDeficit ? '熱量赤字 kcal' : '熱量盈餘 kcal';
     html += '<div class="stat-card ' + balClass + '"><div class="stat-icon">' + balIcon + '</div><div class="stat-value">' + (isDeficit ? '' : '+') + balance + '</div><div class="stat-label">' + balLabel + '</div></div>';
     html += '</div>';
 
-    // 熱量進出比
-    const fillClass = isDeficit ? 'fill-good' : 'fill-bad';
-    const pctClass  = isDeficit ? 'pct-good' : 'pct-bad';
+    var fillClass = isDeficit ? 'fill-good' : 'fill-bad';
+    var pctClass  = isDeficit ? 'pct-good' : 'pct-bad';
     html += '<div class="card balance-card">';
     html += '<div class="balance-header"><span class="balance-title">熱量進出比</span><span class="balance-pct ' + pctClass + '">' + pct + '%</span></div>';
     html += '<div class="progress-bar"><div class="progress-fill ' + fillClass + '" style="width:' + pct + '%"></div></div>';
     html += '<div class="progress-labels"><span>攝取 ' + foodCal + ' kcal</span><span>目標 ' + total_burn + ' kcal</span></div>';
-    if (isDeficit) {
-      html += '<div class="deficit-tag">🎯 赤字 ' + Math.abs(balance) + ' kcal — 很棒！繼續保持</div>';
-    } else {
-      html += '<div class="surplus-tag">💡 盈餘 ' + balance + ' kcal — 可以增加運動或減少飲食</div>';
-    }
+    html += isDeficit
+      ? '<div class="deficit-tag">🎯 赤字 ' + Math.abs(balance) + ' kcal — 很棒！繼續保持</div>'
+      : '<div class="surplus-tag">💡 盈餘 ' + balance + ' kcal — 可以增加運動或減少飲食</div>';
     html += '</div>';
 
-    // 蛋白質進度
     if (proteinGoal > 0) {
-      const pProtClass = proteinPct >= 100 ? 'pct-good' : '';
+      var pProtClass = proteinPct >= 100 ? 'pct-good' : '';
       html += '<div class="card balance-card">';
       html += '<div class="balance-header"><span class="balance-title">🥩 蛋白質進度</span><span class="balance-pct ' + pProtClass + '">' + proteinPct + '%</span></div>';
       html += '<div class="progress-bar"><div class="progress-fill fill-protein" style="width:' + proteinPct + '%"></div></div>';
       html += '<div class="progress-labels"><span>已攝取 ' + protein.toFixed(1) + ' g</span><span>目標 ' + proteinGoal + ' g</span></div>';
-      if (proteinPct >= 100) {
-        html += '<div class="deficit-tag">💪 蛋白質達標！</div>';
-      } else {
-        html += '<div class="surplus-tag" style="color:var(--teal)">還差 ' + (proteinGoal - protein).toFixed(1) + ' g 蛋白質</div>';
-      }
+      html += proteinPct >= 100
+        ? '<div class="deficit-tag">💪 蛋白質達標！</div>'
+        : '<div class="surplus-tag" style="color:var(--teal)">還差 ' + (proteinGoal - protein).toFixed(1) + ' g 蛋白質</div>';
       html += '</div>';
     }
+
+    // 喝水卡片
+    html += '<div id="water-card-container">' + Water.renderCard() + '</div>';
 
     html += '<div class="card chart-card"><div class="card-title">近 7 日熱量趨勢</div><div class="chart-wrap"><canvas id="trend-chart"></canvas></div></div>';
 
@@ -79,6 +76,7 @@ const Dashboard = {
   },
 
   afterRender() {
+    Water.bindCardEvents();
     Dashboard.renderChart();
   },
 
